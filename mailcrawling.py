@@ -13,7 +13,11 @@ messages = inbox.Items
 # all messages' count
 msg_count = messages.count
 # var for messages numbering
-i = 1
+KbIdx = 1
+BnkIdx = 1
+HanaIdx = 1
+YtIdx = 1
+EbIdx = 1
 
 # -------------- Excel Variations
 # Beginning of Excel
@@ -21,17 +25,33 @@ excel = win32com.client.Dispatch("Excel.Application")
 excel.Visible = True
 # Set the new workbook
 wb = op.Workbook()
-# Set the new sheet
+# Active the sheet
 ws = wb.active
+# Set the new sheet
+kbws = wb.create_sheet('KB', 0)
+bnkws = wb.create_sheet('BNK', 1)
+hanaws = wb.create_sheet('하나', 2)
+ytws = wb.create_sheet('유안타', 3)
+ebws = wb.create_sheet('이베스트', 4)
 
+# -------------- Keywords List
+# declude list
+declude = ['DB', 'db', 'OMS', 'oms', '다올', '유지보수', '점검']
+# solting include list
+kblist = ['KB', 'kb']
+bnklist = ['BNK', 'bnk']
+hanalist = ['하나금융', '하나투자']
+ytlist = ['유안타', 'yuanta']
+eblist = ['이베스트', 'ebst']
+
+# -------------- File Path
 SavePath = "C:\\Users\\gee\\Desktop\\"
 AttachPath = "C:\\Users\\gee\\Desktop\\attachments\\"
 
-# -------------- Mail Crawling
-for mail in messages:
+# -------------- Mail Crawling Function
+def MailCrawling(ws, i):
     # Viewing Progress
-    os.system('cls')
-    print("In progress... (" + str(i) + "/" + str(msg_count)+ ")")
+    ViewingProgress(i)
     
     # The arrow object to get the received time.
     arrowobj = arrow.get(mail.ReceivedTime)
@@ -60,7 +80,34 @@ for mail in messages:
     for j in range(1, r+1):
         attachment = attachments.Item(j)
         attachment.SaveASFile(AttachPath + str(i) + "_" + str(j) + "_" + str(attachment)) # File Name
-    i += 1
+    return i
 
-# -------------- Save Excel File
-wb.save(SavePath + "mailcrawling.xlsx")
+# -------------- Viewing Progress Function
+def ViewingProgress(i):
+    os.system('cls')
+    print("In progress... (" + str(KbIdx+BnkIdx+HanaIdx+YtIdx+EbIdx) + "/" + str(msg_count)+ ")")
+
+# -------------- MAIN
+if __name__ == '__main__':
+    # -------------- Mail Crawling Filtering Kewords
+    for mail in messages:
+        if any(str in mail.Subject + mail.Body for str in declude):
+            print(mail.Subject + "해당없음")
+        elif any(str in mail.Subject + mail.Body for str in kblist):
+            KbIdx = MailCrawling(kbws, KbIdx)
+            KbIdx += 1
+        elif any(str in mail.Subject + mail.Body for str in bnklist):
+            BnkIdx = MailCrawling(bnkws, BnkIdx)
+            BnkIdx += 1
+        elif any(str in mail.Subject + mail.Body for str in hanalist):
+            HanaIdx = MailCrawling(hanaws, HanaIdx)
+            HanaIdx += 1
+        elif any(str in mail.Subject + mail.Body for str in ytlist):
+            YtIdx = MailCrawling(ytws, YtIdx)
+            YtIdx += 1
+        elif any(str in mail.Subject + mail.Body for str in eblist):
+            EbIdx = MailCrawling(ebws, EbIdx)
+            EbIdx += 1
+
+    # -------------- Save Excel File
+    wb.save(SavePath + "mailcrawling.xlsx")
