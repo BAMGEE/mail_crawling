@@ -24,6 +24,9 @@ wb = op.Workbook()
 # Set the new sheet
 ws = wb.active
 
+SavePath = "C:\\Users\\gee\\Desktop\\"
+AttachPath = "C:\\Users\\gee\\Desktop\\attachments\\"
+
 # -------------- Mail Crawling
 for mail in messages:
     # Viewing Progress
@@ -56,8 +59,8 @@ for mail in messages:
     # Loop to save attachments (File Name: MailNumbering_AttachmentCount_AttachmentTitle)
     for j in range(1, r+1):
         attachment = attachments.Item(j)
-        attachment.SaveASFile("C:\\Users\\gee\\Desktop\\attachments\\" + str(i) + "_" + str(j) + "_" + str(attachment)) # File Name
+        attachment.SaveASFile(AttachPath + str(i) + "_" + str(j) + "_" + str(attachment)) # File Name
     i += 1
 
 # -------------- Save Excel File
-wb.save("C:\\Users\\gee\\Desktop\\output.xlsx")
+wb.save(SavePath + "mailcrawling.xlsx")
