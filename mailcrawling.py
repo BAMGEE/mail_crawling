@@ -12,12 +12,8 @@ inbox = outlook.GetDefaultFolder(6).Folders["exture3"]
 messages = inbox.Items
 # all messages' count
 msg_count = messages.count
-# var for messages numbering
-KbIdx = 1
-BnkIdx = 1
-HanaIdx = 1
-YtIdx = 1
-EbIdx = 1
+# var for skip messages numbering
+skip = 1
 
 # -------------- Excel Variations
 # Beginning of Excel
@@ -27,22 +23,38 @@ excel.Visible = True
 wb = op.Workbook()
 # Active the sheet
 ws = wb.active
-# Set the new sheet
-kbws = wb.create_sheet('KB', 0)
-bnkws = wb.create_sheet('BNK', 1)
-hanaws = wb.create_sheet('하나', 2)
-ytws = wb.create_sheet('유안타', 3)
-ebws = wb.create_sheet('이베스트', 4)
 
-# -------------- Keywords List
-# declude list
-declude = ['DB', 'db', 'OMS', 'oms', '다올', '유지보수', '점검']
-# solting include list
-kblist = ['KB', 'kb']
-bnklist = ['BNK', 'bnk']
-hanalist = ['하나금융', '하나투자']
-ytlist = ['유안타', 'yuanta']
-eblist = ['이베스트', 'ebst']
+# -------------- Class
+class Site:
+    idx = 1
+    list = []
+    ws = None
+
+# -------------- Site
+kb = Site()
+kb.idx = 1
+kb.ws = wb.create_sheet('KB', 0)
+kb.list = ['KB', 'kb']
+
+bnk = Site()
+bnk.idx = 1
+bnk.ws = wb.create_sheet('BNK', 1)
+bnk.list = ['BNK', 'bnk']
+
+hana = Site()
+hana.idx = 1
+hana.ws = wb.create_sheet('하나', 2)
+hana.list = ['하나금융', '하나투자']
+
+yt = Site()
+yt.idx = 1
+yt.ws = wb.create_sheet('유안타', 3)
+yt.list = ['유안타', 'yuanta']
+
+eb = Site()
+eb.idx = 1
+eb.ws = wb.create_sheet('이베스트', 4)
+eb.list = ['이베스트', 'ebst']
 
 # -------------- File Path
 SavePath = "C:\\Users\\gee\\Desktop\\"
@@ -85,29 +97,35 @@ def MailCrawling(ws, i):
 # -------------- Viewing Progress Function
 def ViewingProgress(i):
     os.system('cls')
-    print("In progress... (" + str(KbIdx+BnkIdx+HanaIdx+YtIdx+EbIdx) + "/" + str(msg_count)+ ")")
+    print("In progress... (" + str((kb.idx-1)+(bnk.idx-1)+(hana.idx-1)+(yt.idx-1)+(eb.idx-1)+skip) + "/" + str(msg_count)+ ")")
 
 # -------------- MAIN
 if __name__ == '__main__':
     # -------------- Mail Crawling Filtering Kewords
     for mail in messages:
-        if any(str in mail.Subject + mail.Body for str in declude):
-            print(mail.Subject + "해당없음")
-        elif any(str in mail.Subject + mail.Body for str in kblist):
-            KbIdx = MailCrawling(kbws, KbIdx)
-            KbIdx += 1
-        elif any(str in mail.Subject + mail.Body for str in bnklist):
-            BnkIdx = MailCrawling(bnkws, BnkIdx)
-            BnkIdx += 1
-        elif any(str in mail.Subject + mail.Body for str in hanalist):
-            HanaIdx = MailCrawling(hanaws, HanaIdx)
-            HanaIdx += 1
-        elif any(str in mail.Subject + mail.Body for str in ytlist):
-            YtIdx = MailCrawling(ytws, YtIdx)
-            YtIdx += 1
-        elif any(str in mail.Subject + mail.Body for str in eblist):
-            EbIdx = MailCrawling(ebws, EbIdx)
-            EbIdx += 1
-
+        if any(str in mail.Subject + mail.Body for str in kb.list):
+            kb.idx = MailCrawling(kb.ws, kb.idx)
+            kb.idx += 1
+        elif any(str in mail.Subject + mail.Body for str in bnk.list):
+            bnk.idx = MailCrawling(bnk.ws, bnk.idx)
+            bnk.idx += 1
+        elif any(str in mail.Subject + mail.Body for str in hana.list):
+            hana.idx = MailCrawling(hana.ws, hana.idx)
+            hana.idx += 1
+        elif any(str in mail.Subject + mail.Body for str in yt.list):
+            yt.idx = MailCrawling(yt.ws, yt.idx)
+            yt.idx += 1
+        elif any(str in mail.Subject + mail.Body for str in eb.list):
+            eb.idx = MailCrawling(eb.ws, eb.idx)
+            eb.idx += 1
+        else:
+            ViewingProgress(skip)
+            skip += 1
+            
     # -------------- Save Excel File
+    print("KB: "+str(kb.idx-1))
+    print("BNK: "+str(bnk.idx-1))
+    print("HANA: "+str(hana.idx-1))
+    print("YUANTA: "+str(yt.idx-1))
+    print("EBEST: "+str(eb.idx-1))
     wb.save(SavePath + "mailcrawling.xlsx")
