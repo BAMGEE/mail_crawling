@@ -24,13 +24,16 @@ wb = op.Workbook()
 # Active the sheet
 ws = wb.active
 
+sites = []
+
 # -------------- Class
 class Site:
-    list = []
-    
     def __init__(self, ws, idx):
         self.ws = ws
         self.idx = idx
+        self.list = []
+        # Add in the site list
+        sites.append(self)
     
     # -------------- Mail Crawling Function
     def MailCrawling(self):
@@ -82,42 +85,48 @@ yt.list = ['유안타', 'yuanta']
 eb = Site(wb.create_sheet('이베스트', 4), 1)
 eb.list = ['이베스트', 'ebst']
 
+hk = Site(wb.create_sheet('한투', 5), 1)
+hk.list = ['한국투자', '한국']
+
+sf = Site(wb.create_sheet('삼성선물', 6), 1)
+sf.list = ['삼성선물', '삼성']
+
+nhf = Site(wb.create_sheet('NH선물', 7), 1)
+nhf.list = ['nh', 'NH', 'nh선물', 'NH선물']
+
+hh = Site(wb.create_sheet('한화', 8), 1)
+hh.list = ['한화', 'hanhwa']
+
 # -------------- File Path
 SavePath = "C:\\Users\\gee\\Desktop\\"
 AttachPath = "C:\\Users\\gee\\Desktop\\attachments\\"
 
 # -------------- Viewing Progress Function
 def ViewingProgress():
+    progress = 0
+    
     os.system('cls')
-    print("In progress... (" + str((kb.idx-1)+(bnk.idx-1)+(hana.idx-1)+(yt.idx-1)+(eb.idx-1)+skip) + "/" + str(msg_count)+ ")")
+    
+    for site in sites:
+        progress += site.idx-1
+    
+    print("In progress... (" + str(progress+skip) + "/" + str(msg_count)+ ")")
 
 # -------------- MAIN
 if __name__ == '__main__':
     # -------------- Mail Crawling Filtering Kewords
     for mail in messages:
-        if any(str in mail.Subject + mail.Body for str in kb.list):
-            kb.idx = kb.MailCrawling()
-            kb.idx += 1
-        elif any(str in mail.Subject + mail.Body for str in bnk.list):
-            bnk.idx = bnk.MailCrawling()
-            bnk.idx += 1
-        elif any(str in mail.Subject + mail.Body for str in hana.list):
-            hana.idx = hana.MailCrawling()
-            hana.idx += 1
-        elif any(str in mail.Subject + mail.Body for str in yt.list):
-            yt.idx = yt.MailCrawling()
-            yt.idx += 1
-        elif any(str in mail.Subject + mail.Body for str in eb.list):
-            eb.idx = eb.MailCrawling()
-            eb.idx += 1
-        else:
+        chk = 0
+        for site in sites:
+            if any(str in mail.Subject + mail.Body for str in site.list):
+                site.idx = site.MailCrawling()
+                site.idx += 1
+                chk = 1
+                break
+        if chk == 0:
             ViewingProgress()
             skip += 1
             
     # -------------- Save Excel File
-    print("KB: "+str(kb.idx-1))
-    print("BNK: "+str(bnk.idx-1))
-    print("HANA: "+str(hana.idx-1))
-    print("YUANTA: "+str(yt.idx-1))
-    print("EBEST: "+str(eb.idx-1))
     wb.save(SavePath + "mailcrawling.xlsx")
+    print("complete!")
