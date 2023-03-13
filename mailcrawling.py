@@ -31,7 +31,7 @@ class Site:
     def __init__(self, ws, idx):
         self.ws = ws
         self.idx = idx
-        self.list = []
+        self.keyword = []
         # Add in the site list
         sites.append(self)
     
@@ -71,31 +71,31 @@ class Site:
 
 # -------------- Site
 kb = Site(wb.create_sheet('KB', 0), 1)
-kb.list = ['KB', 'kb']
+kb.keyword = ['KB', 'kb']
 
 bnk = Site(wb.create_sheet('BNK', 1), 1)
-bnk.list = ['BNK', 'bnk']
+bnk.keyword = ['BNK', 'bnk']
 
 hana = Site(wb.create_sheet('하나', 2), 1)
-hana.list = ['하나금융', '하나투자']
+hana.keyword = ['하나금융', '하나투자']
 
 yt = Site(wb.create_sheet('유안타', 3), 1)
-yt.list = ['유안타', 'yuanta']
+yt.keyword = ['유안타', 'yuanta']
 
 eb = Site(wb.create_sheet('이베스트', 4), 1)
-eb.list = ['이베스트', 'ebst']
+eb.keyword = ['이베스트', 'ebst']
 
 hk = Site(wb.create_sheet('한투', 5), 1)
-hk.list = ['한국투자', '한국']
+hk.keyword = ['한국투자', '한국']
 
 sf = Site(wb.create_sheet('삼성선물', 6), 1)
-sf.list = ['삼성선물', '삼성']
+sf.keyword = ['삼성선물', '삼성']
 
 nhf = Site(wb.create_sheet('NH선물', 7), 1)
-nhf.list = ['nh', 'NH', 'nh선물', 'NH선물']
+nhf.keyword = ['nh', 'NH', 'nh선물', 'NH선물']
 
 hh = Site(wb.create_sheet('한화', 8), 1)
-hh.list = ['한화', 'hanhwa']
+hh.keyword = ['한화', 'hanhwa']
 
 # -------------- File Path
 SavePath = "C:\\Users\\gee\\Desktop\\"
@@ -104,12 +104,9 @@ AttachPath = "C:\\Users\\gee\\Desktop\\attachments\\"
 # -------------- Viewing Progress Function
 def ViewingProgress():
     progress = 0
-    
     os.system('cls')
-    
     for site in sites:
         progress += site.idx-1
-    
     print("In progress... (" + str(progress+skip) + "/" + str(msg_count)+ ")")
 
 # -------------- MAIN
@@ -118,7 +115,7 @@ if __name__ == '__main__':
     for mail in messages:
         chk = 0
         for site in sites:
-            if any(str in mail.Subject + mail.Body for str in site.list):
+            if any(str in mail.Subject + mail.Body for str in site.keyword):
                 site.idx = site.MailCrawling()
                 site.idx += 1
                 chk = 1
