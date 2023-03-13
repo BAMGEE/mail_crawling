@@ -48,7 +48,7 @@ class Site:
         # Col B: Received datetime(set 'tzinfo' to 'None')
         self.ws[f'B{self.idx}'] = arrowobj.datetime.replace(tzinfo=None)
         # Col C: Sender Name(Sender Email Address)
-        if mail.Class == 43 and mail.SenderEmailType == 'EX' and mail.Sender.GetExchangeUser() != None:
+        if mail.SenderEmailType == 'EX' and mail.Sender.GetExchangeUser() != None:
             self.ws[f'C{self.idx}'] = mail.SenderName + "(" + mail.Sender.GetExchangeUser().PrimarySmtpAddress + ")"
         else:
             self.ws[f'C{self.idx}'] = mail.SenderName + "(" + mail.SenderEmailAddress + ")"
@@ -113,16 +113,17 @@ def ViewingProgress():
 if __name__ == '__main__':
     # -------------- Mail Crawling Filtering Kewords
     for mail in messages:
-        chk = 0
-        for site in sites:
-            if any(str in mail.Subject + mail.Body for str in site.keyword):
-                site.idx = site.MailCrawling()
-                site.idx += 1
-                chk = 1
-                break
-        if chk == 0:
-            ViewingProgress()
-            skip += 1
+        if mail.Class == 43:
+            chk = 0
+            for site in sites:
+                if any(str in mail.Subject + mail.Body for str in site.keyword):
+                    site.idx = site.MailCrawling()
+                    site.idx += 1
+                    chk = 1
+                    break
+            if chk == 0:
+                ViewingProgress()
+                skip += 1
             
     # -------------- Save Excel File
     wb.save(SavePath + "mailcrawling.xlsx")
