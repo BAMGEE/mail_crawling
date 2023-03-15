@@ -52,7 +52,7 @@ class Site:
             self.ws[f'C{self.idx}'] = mail.SenderName + "(" + mail.Sender.GetExchangeUser().PrimarySmtpAddress + ")"
         else:
             self.ws[f'C{self.idx}'] = mail.SenderName + "(" + mail.SenderEmailAddress + ")"
-        # Col D: receiving email addresse
+        # Col D: receiving email address
         self.ws[f'D{self.idx}'] = mail.To
         # Col E: Mail Title
         self.ws[f'E{self.idx}'] = mail.Subject
@@ -66,36 +66,38 @@ class Site:
         # Loop to save attachments (File Name: MailNumbering_AttachmentCount_AttachmentTitle)
         for j in range(1, r+1):
             attachment = attachments.Item(j)
-            attachment.SaveASFile(AttachPath + str(self.idx) + "_" + str(j) + "_" + str(attachment)) # File Name
+            # Skip saving unnecessary attachments (.png, .gif)
+            if attachment.FileName.split('.')[-1] != 'png' and attachment.FileName.split('.')[-1] != 'gif':
+                attachment.SaveASFile(AttachPath + str(self.keyword[0]) + "_" + str(self.idx) + "_" + str(j) + "_" + str(attachment)) # File Name
         return self.idx
 
 # -------------- Site
 kb = Site(wb.create_sheet('KB', 0), 1)
-kb.keyword = ['KB', 'kb']
+kb.keyword = ['kb', 'KB']
 
 bnk = Site(wb.create_sheet('BNK', 1), 1)
-bnk.keyword = ['BNK', 'bnk']
+bnk.keyword = ['bnk', 'BNK']
 
 hana = Site(wb.create_sheet('하나', 2), 1)
-hana.keyword = ['하나금융', '하나투자']
+hana.keyword = ['hana', '하나금융', '하나투자']
 
 yt = Site(wb.create_sheet('유안타', 3), 1)
-yt.keyword = ['유안타', 'yuanta']
+yt.keyword = ['yuanta', '유안타']
 
 eb = Site(wb.create_sheet('이베스트', 4), 1)
-eb.keyword = ['이베스트', 'ebst']
+eb.keyword = ['ebest', '이베스트']
 
 hk = Site(wb.create_sheet('한투', 5), 1)
-hk.keyword = ['한국투자', '한국']
+hk.keyword = ['hankook', '한국투자', '한국']
 
 sf = Site(wb.create_sheet('삼성선물', 6), 1)
-sf.keyword = ['삼성선물', '삼성']
+sf.keyword = ['samsungf', '삼성선물', '삼성']
 
 nhf = Site(wb.create_sheet('NH선물', 7), 1)
-nhf.keyword = ['nh', 'NH', 'nh선물', 'NH선물']
+nhf.keyword = ['nhf', 'NH', 'nh선물', 'NH선물']
 
 hh = Site(wb.create_sheet('한화', 8), 1)
-hh.keyword = ['한화', 'hanhwa']
+hh.keyword = ['hanhwa', '한화']
 
 # -------------- File Path
 SavePath = "C:\\Users\\gee\\Desktop\\"
